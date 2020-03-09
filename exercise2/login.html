@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
     <title>Login</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
   </head>
   <body>
     <h1>Please Log In</h1>
@@ -11,7 +12,10 @@
       <input type="text" id="username" name="username" placeholder="Username...">
       <input type="submit" id="submit" onclick="getUsername(username)">
     </form>
-    
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.js"
+      integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+      crossorigin="anonymous"></script>
     <script>
       var theName = document.getElementById('username');
 
@@ -21,17 +25,26 @@
             if(users.length){
               let userSave = users[0];
               resolve(users[0].username);
+              window.location('userHome.html');
             } else{
               reject('Username of: ' + username + "; Not found. Please try again");
             }
           })
         })
+      }
+
+      function render(user){
+        console.log(user);
+      }
+
+      function showUser(){
+        getUsername(theName).
+        then(render);
       } 
 
+      showUser();
+
     </script>
-    <script
-      src="https://code.jquery.com/jquery-3.4.1.js"
-      integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
-      crossorigin="anonymous"></script>
+    
   </body>
 </html>
