@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>repl.it</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <div id="action">
+      <ul id="postList"></ul>
+    </div>
+    <ul id="commentList">
+      <h4>This post's comments</h4>
+      <button id="goBack">Go Back to Posts</button>
+    </ul>
+
+    <button id="btnOne">Get All Posts</button>
+    <button id="btnTwo">Get Post with ID: 10</button>
+    <button id="btnThree">Get Comments from Post with ID of 12</button>
+    <button id="btnFour">Get Posts from User with ID 2</button>
+    <button id="btnFive">New Post</button>
+    <button id="btnSix">Replace post with id of 12</button>
+    <button id="btnSeven">Update Title of Post with ID of 12</button>
+    <button id="btnEight">Delete Post with ID of 12</button>
+    <button id="btnNine">Display posts and click on a post to see its comments</button>
+  
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.js"
+      integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+      crossorigin="anonymous"></script> 
+    <script>
+      //Exercise 1
+$('#commentList').hide();
+//1 - get all posts
+var list = $('ul#postList');
+$('#btnOne').click(function(){
+  $('li').remove();
+  $.get('https://jsonplaceholder.typicode.com/posts', function(posts){
+    posts.forEach(function(post){
+      var li = $('<li></li>');
+      li.text(post.id + ": " + post.body);
+      list.append(li);
+    })
+  })
+  })
+
+//2 - get post with ID 10
+$('#btnTwo').click(function(){
+  $('li').remove();
+  $.get('https://jsonplaceholder.typicode.com/posts/10',  function(post){
+    var li = $('<li></li>');
+    li.text(post.id + ": " + post.body);
+    list.append(li);
+  })
+})
+
+//3 - Get the comments from post with id of 12
+$('#btnThree').click(function(){
+  $('li').remove();
+  $.get('https://jsonplaceholder.typicode.com/posts/12/comments', function(comments){
+    comments.forEach(function(comment){
+      var name = $('<li></li>');
+      var email = $('<li></li>');
+      var body = $('<li></li>');
+      var empty = $('<li></li>');
+      name.text("Name: " + comment.name);
+      email.text("Email: " + comment.email);
+      body.text(comment.body + "\n");
+      name.css("font-weight", "bold");
+      list.append(name);
+      list.append(email);
+      list.append(body);
+    })
+})
+})
+
+//4 - Get all the posts from user with id of 2
+$('#btnFour').click(function(){
+  $('li').remove();
+  $.get('https://jsonplaceholder.typicode.com/user/2/posts',     function(posts){
+      posts.forEach(function(post){
+        var li = $('<li></li>');
+        li.text(post.id + ": " + post.body);
+        list.append(li);
+      })
+  })
+})
+
+//5 - Create a new post and log the id generated for it by the server
+$('#btnFive').click(function(){
+  $('li').remove();
+  $.post('https://jsonplaceholder.typicode.com/posts',{
+      userId: 1,
+      title: "New Post",
+      body: "Tax Exemptions"
+    }, function(post){
+        var li = $('<li></li>');
+        li.text(post.id + " - " + post.title + ": " + post.body);
+        list.append(li);
+  }
+)
+})
+
+//6 - Replace the post with id of 12 and render the responseJSON
+$('#btnSix').click(function(){
+  $('li').remove();
+  $.ajax({
+    method: 'PUT',
+    url: 'https://jsonplaceholder.typicode.com/posts/12',
+    data: {
+      userId: 1, 
+      title: 'Replace', 
+      body: 'Replacement'
+  }, 
+    complete: function(response){
+      var li = $('<li></li>');
+      var jString = JSON.stringify(response.responseJSON);
+      li.text(jString);
+      list.append(li);
+      console.log(response.responseJSON);
+  }
+})
+})
+
+//7 - Update the title of post with id of 12 and render responseJSON
+$('#btnSeven').click(function(){
+  $('li').remove();
+  $.ajax({
+    method: 'PATCH',
+    url: 'https://jsonplaceholder.typicode.com/posts/12',
+    data: {
+      title: 'New and Improved Title',
+  },
+    complete: function(response){
+      var li = $('<li></li>');
+      var jString = JSON.stringify(response.responseJSON);
+      li.text(jString);
+      list.append(li);
+      console.log(response.responseJSON);
+  }
+})
+})
+
+//8 - Delete the post with id of 12 and render a success message
+$('#btnEight').click(function(){
+  $('li').remove();
+  $.ajax({
+    method: 'DELETE',
+    url: 'https://jsonplaceholder.typicode.com/posts/12',
+    complete: function(response){
+      var li = $('<li></li>');
+      var jString = JSON.stringify(response.statusText);
+      li.text(jString);
+      list.append(li);
+      console.log(response.statusText);
+    }
+})
+})
+var commentList = $('ul#commentList');
+
+//display a list of posts
+$('#btnNine').click(function(){
+  $('li').remove();
+  $.get('https://jsonplaceholder.typicode.com/user/1/posts', function(posts){
+    posts.forEach(function(post){
+      var item = $('<li></li>');
+      item.text(post.body);
+      list.append(item);
+      $('li').click(function(){
+        $('#postList').hide();
+        $('#commentList').show();
+        $.get('https://jsonplaceholder.typicode.com/posts/'+post.id+'/comments', function(comments){
+          comments.forEach(function(comment){
+            var name = $('<li></li>');
+            var email = $('<li></li>');
+            var body = $('<li></li>');
+            name.text("Name: " + comment.name);
+            email.text("Email: " + comment.email);
+            body.text(comment.body + "\n");
+            name.css("font-weight", "bold");
+            commentList.append(name);
+            commentList.append(email);
+            commentList.append(body);
+        })
+      })
+  })
+    })
+})
+})
+
+$('#goBack').click(function(){
+  $('#commentList').hide();
+  $('#postList').show();
+})
+
+
+
+    </script>
+  </body>
+</html>
