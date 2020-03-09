@@ -7,25 +7,43 @@
     <link href="style.css" rel="stylesheet" type="text/css" />
   </head>
   <body>
-    <h1>Please Log In</h1>
-    <form id="theForm">
-      <input type="text" id="username" name="username" placeholder="Username...">
-      <input type="submit" id="submit" onclick="getUsername(username)">
-    </form>
+      <div id="logIn">
+        <h1>Please Log In</h1>
+        <form id="theForm">
+          <input type="text" id="username" name="username" placeholder="Username...">
+          <input type="submit" id="submit">
+        </form>
+        <p id="error" hidden>Username not found. Please try again.</p>
+      </div>
+      <div id="userPage">
+        <h1 id="user"></h1>
+        <ol id="postTitleList"></ol>
+        <ul id="albumList"></ul>
+      </div>
+
     <script
       src="https://code.jquery.com/jquery-3.4.1.js"
       integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
       crossorigin="anonymous"></script>
     <script>
+      const form = document.getElementById('form');
+      const error = document.getElementById('error');
       var theName = document.getElementById('username');
 
-      function getUsername(username){
+      var userName = $('#user');
+      var postTitleList = $('#postTitleList');
+      var albumList = $('#albumList');
+
+
+      function getUser(username){
         return new Promise(function(resolve, reject){
           $.get('https://jsonplaceholder.typicode.com/users?username=' + username, function(users){
             if(users.length){
               let userSave = users[0];
+              $('#theForm').hide();
+              //userName.text(userSave.username);
               resolve(users[0].username);
-              window.location('userHome.html');
+              
             } else{
               reject('Username of: ' + username + "; Not found. Please try again");
             }
@@ -33,14 +51,18 @@
         })
       }
 
-      function render(user){
-        console.log(user);
-      }
+      function getPostsByUser(user) {
+      return new Promise(function(resolve,reject){
+        $.get('https://jsonplaceholder.typicode.com/posts?userId=' + user.id, function(posts){
+        resolve(posts);
+   });
+})
+}
 
       function showUser(){
-        getUsername(theName).
-        then(render);
-      } 
+        getUser(theName)
+        .then(getPostsByUser);
+      }
 
       showUser();
 
